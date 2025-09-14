@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Promises to You</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;   /* allow page to grow */
+    display: flex;
+    flex-direction: column; /* stack top to bottom */
+    justify-content: flex-start;
+    align-items: center;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3, #ff99ac);
+    background-size: 300% 300%;
+    font-family: "Segoe UI", Roboto, sans-serif;
+    color: white;
+    text-align: center;
+    animation: bgShift 12s ease infinite;
+    padding: 20px; /* spacing for mobile */
+  }
+
+  h1 {
+    font-size: 2.2em;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(255, 77, 120, 0.8);
+    animation: fadeDown 1.5s ease forwards;
+  }
+
+  /* Photo */
+  .photo {
+    margin: 20px 0;
+    opacity: 0;
+    transform: scale(0.9);
+    animation: fadeUp 1.6s ease forwards 1.2s;
+  }
+
+  .photo img {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+    border: 6px solid transparent;
+    background: linear-gradient(45deg, #ff4d6d, #ff99ac, #ffd700, #ff4d6d);
+    background-size: 400% 400%;
+    box-shadow: 0 0 25px rgba(255,255,255,0.6),
+                0 0 50px rgba(255,77,120,0.6);
+    animation: borderGlow 8s linear infinite, pulseGlow 4s infinite alternate ease-in-out;
+  }
+
+  /* Promises */
+  .promises {
+    max-width: 600px;
+    font-size: 1.1em;
+    line-height: 1.8;
+    margin-top: 20px;
+    text-align: left;
+  }
+
+  .promises p {
+    margin: 14px 0;
+    opacity: 0;
+    animation: fadeUp 1.2s ease forwards;
+  }
+
+  .promises p:nth-child(1) { animation-delay: 2.5s; }
+  .promises p:nth-child(2) { animation-delay: 3.5s; }
+  .promises p:nth-child(3) { animation-delay: 4.5s; }
+  .promises p:nth-child(4) { animation-delay: 5.5s; }
+  .promises p:nth-child(5) { animation-delay: 6.5s; }
+
+  /* Next button */
+  button {
+    margin: 40px 0 20px;
+    padding: 12px 28px;
+    background: white;
+    color: #ff2d55;
+    font-weight: bold;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: 0.3s;
+    opacity: 0;
+    animation: fadeUp 1.5s ease forwards 7.5s;
+  }
+  button:hover {
+    background: #ffeaf0;
+    transform: scale(1.08);
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes pulseGlow {
+    from {
+      transform: scale(1);
+      box-shadow: 0 0 20px rgba(255,255,255,0.5),
+                  0 0 40px rgba(255,77,120,0.4);
+    }
+    to {
+      transform: scale(1.05);
+      box-shadow: 0 0 35px rgba(255,255,255,0.9),
+                  0 0 70px rgba(255,77,120,0.6);
+    }
+  }
+
+  @keyframes borderGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+</style>
+</head>
+<body>
+
+  <h1>My Promises to You, Devu💍</h1>
+
+  <div class="photo">
+    <img src="pic2.jpg" alt="Our Love">
+  </div>
+
+  <div class="promises">
+    <p>🌹 I promise to love you endlessly.</p>
+    <p>🤝 I promise to stand by you in every storm.</p>
+    <p>😊 I promise to bring smiles to your face every day.</p>
+    <p>✨ I promise to dream with you, grow with you, and never let go.</p>
+    <p>💖 I promise that forever, my heart will always belong to you.</p>
+  </div>
+
+  <button onclick="window.location.href='puzzle3.html'">Next →</button>
+
+</body>
+</html>
+

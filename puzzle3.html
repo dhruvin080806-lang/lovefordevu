@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Love Puzzle</title>
+<style>
+  body {
+    margin:0;
+    min-height:100vh;            /* allow page to expand */
+    display:flex;
+    flex-direction:column;       /* natural flow top-to-bottom */
+    justify-content:flex-start;
+    align-items:center;
+    background: radial-gradient(circle at center, #1b2735, #090a0f);
+    font-family: "Segoe UI", sans-serif;
+    color:white;
+    padding:20px;                /* breathing room on mobile */
+    /* removed overflow:hidden */
+  }
+
+  h1 {
+    margin-bottom: 15px;
+    text-shadow: 0 0 20px #ff4d6d;
+    text-align:center;
+    font-size:clamp(1.2em, 4vw, 2em);
+  }
+
+  #puzzle {
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap:2px;
+    background:#222;
+    padding:5px;
+    border-radius:10px;
+    width:90vw;         
+    max-width:360px;    
+    aspect-ratio:1/1;   
+  }
+
+  .piece {
+    background-image:url("pic3.jpg"); /* your couple photo */
+    background-size:300% 300%; /* because it's 3×3 grid */
+    cursor:grab;
+    border-radius:4px;
+  }
+
+  #message {
+    margin-top:15px;
+    font-size:clamp(1em, 3vw, 1.5em);
+    color:#ff99ac;
+    opacity:0;
+    transition:opacity 1s ease;
+    text-align:center;
+  }
+
+  #next-btn {
+    margin-top:15px;
+    padding:10px 20px;
+    font-size:1em;
+    background:white;
+    color:#ff2d55;
+    border:none;
+    border-radius:25px;
+    cursor:pointer;
+    display:none;
+    box-shadow:0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  #next-btn:hover {
+    transform:scale(1.05);
+    background:#ffeaf0;
+  }
+
+  #confetti {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:999;
+  }
+</style>
+</head>
+<body>
+  <h1>🧩 Complete the Puzzle 🧩</h1>
+  <div id="puzzle"></div>
+  <div id="message">✨ You solved it! Just like you complete me ✨</div>
+  <button id="next-btn" onclick="window.location.href='music3.html'">✨ Next Surprise</button>
+  <canvas id="confetti"></canvas>
+
+<script>
+  const puzzle = document.getElementById("puzzle");
+  const size = 3; // 3x3 (easy version)
+  const pieces = [];
+  let dragSrc = null;
+
+  // Create pieces
+  for(let row=0; row<size; row++){
+    for(let col=0; col<size; col++){
+      const piece = document.createElement("div");
+      piece.classList.add("piece");
+      piece.style.backgroundPosition = `${(col*100/ (size-1))}% ${(row*100/(size-1))}%`;
+      piece.dataset.correct = row*size+col;
+      pieces.push(piece);
+    }
+  }
+
+  // Shuffle
+  pieces.sort(()=>Math.random()-0.5);
+  pieces.forEach(p=>puzzle.appendChild(p));
+
+  // Drag & drop
+  function handleDragStart(e){
+    dragSrc = this;
+    e.dataTransfer.effectAllowed = "move";
+  }
+  function handleDragOver(e){
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }
+  function handleDrop(e){
+    if(dragSrc!==this){
+      const srcIndex=[...puzzle.children].indexOf(dragSrc);
+      const targetIndex=[...puzzle.children].indexOf(this);
+      if(srcIndex>-1 && targetIndex>-1){
+        puzzle.insertBefore(dragSrc, puzzle.children[targetIndex]);
+        puzzle.insertBefore(this, puzzle.children[srcIndex]);
+        checkWin();
+      }
+    }
+  }
+
+  pieces.forEach(p=>{
+    p.draggable=true;
+    p.addEventListener("dragstart",handleDragStart);
+    p.addEventListener("dragover",handleDragOver);
+    p.addEventListener("drop",handleDrop);
+  });
+
+  // Check win
+  function checkWin(){
+    const current=[...puzzle.children].map(p=>p.dataset.correct);
+    const solved=current.every((val,idx)=>val==idx);
+    if(solved){
+      document.getElementById("message").style.opacity=1;
+      document.getElementById("next-btn").style.display="inline-block";
+      launchConfetti();
+    }
+  }
+
+  // Confetti
+  const canvas=document.getElementById("confetti");
+  const ctx=canvas.getContext("2d");
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const confetti=[];
+  function Confetto(){
+    this.x=Math.random()*canvas.width;
+    this.y=Math.random()*canvas.height - canvas.height;
+    this.size=Math.random()*8+4;
+    this.speed=Math.random()*3+2;
+    this.color=`hsl(${Math.random()*360},100%,50%)`;
+  }
+  function launchConfetti(){
+    for(let i=0;i<200;i++){confetti.push(new Confetto());}
+    animateConfetti();
+  }
+  function animateConfetti(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confetti.forEach((c,i)=>{
+      c.y+=c.speed;
+      ctx.fillStyle=c.color;
+      ctx.fillRect(c.x,c.y,c.size,c.size);
+      if(c.y>canvas.height) confetti.splice(i,1);
+    });
+    if(confetti.length>0) requestAnimationFrame(animateConfetti);
+  }
+</script>
+</body>
+</html>

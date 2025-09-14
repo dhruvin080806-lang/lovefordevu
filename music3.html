@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Musical Love</title>
+<style>
+  body {
+    margin:0;
+    min-height:100vh;
+    background:radial-gradient(circle at center, #0a0014, #1e0238);
+    overflow:auto;
+    font-family:"Segoe UI", sans-serif;
+    color:white;
+    text-align:center;
+  }
+
+  /* Preloader screen */
+  #preloader {
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:radial-gradient(circle at center, #0a0014, #1e0238);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:9999;
+    transition:opacity 1s ease, transform 1s ease, visibility 1s ease;
+    overflow:hidden;
+  }
+  #preloader h2 {
+    font-size:clamp(1.5em, 5vw, 2em);
+    margin-bottom:20px;
+    color:#ff99ac;
+    text-shadow:0 0 20px #ff4d6d;
+    animation:pulse 2s infinite;
+    z-index:2;
+  }
+  @keyframes pulse {
+    0%,100% { transform:scale(1); opacity:1; }
+    50% { transform:scale(1.05); opacity:0.9; }
+  }
+  #start-btn {
+    padding:14px 28px;
+    font-size:clamp(1em, 4vw, 1.2em);
+    background:white;
+    color:#ff2d55;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    font-weight:bold;
+    box-shadow:0 4px 12px rgba(0,0,0,0.4);
+    transition:transform 0.3s ease, background 0.3s ease;
+    z-index:2;
+  }
+  #start-btn:hover {
+    transform:scale(1.08);
+    background:#ffeaf0;
+  }
+
+  /* Floating hearts in preloader */
+  .heart {
+    position:absolute;
+    font-size:20px;
+    color:#ff4d6d;
+    text-shadow:0 0 10px #ff99ac, 0 0 20px #ff4d6d;
+    opacity:0.8;
+    animation: floatHeart 6s linear forwards;
+    pointer-events:none;
+  }
+  @keyframes floatHeart {
+    0% { transform:translateY(0) scale(0.5); opacity:0; }
+    20% { opacity:1; }
+    100% { transform:translateY(-120vh) scale(1.5); opacity:0; }
+  }
+
+  /* Notes after preloader */
+  .note {
+    position:absolute;
+    font-size:24px;
+    animation: floatUp 6s linear forwards;
+    opacity:0.8;
+    pointer-events:none;
+  }
+  @keyframes floatUp {
+    0% { transform:translateY(0) scale(0.5); opacity:0; }
+    20% { opacity:1; }
+    100% { transform:translateY(-120vh) scale(1.5); opacity:0; }
+  }
+
+  .message {
+    position:absolute;
+    bottom:25%;
+    left:50%;
+    transform:translateX(-50%) scale(0.9);
+    font-size:clamp(1.2em,5vw,1.8em);
+    text-shadow:0 0 20px #ff4d6d;
+    opacity:0;
+    transition:opacity 1s ease, transform 1s ease;
+    width:90%;
+    line-height:1.4;
+  }
+
+  .show {
+    opacity:1 !important;
+    transform:translateX(-50%) scale(1) !important;
+  }
+  .hide {
+    opacity:0 !important;
+    transform:translateX(-50%) scale(0.9) !important;
+  }
+
+  #next-btn {
+    position:absolute;
+    bottom:10%;
+    left:50%;
+    transform:translateX(-50%);
+    padding:12px 24px;
+    font-size:clamp(1em,4vw,1.2em);
+    background:white;
+    color:#ff2d55;
+    border:none;
+    border-radius:25px;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,0.4);
+    opacity:0;
+    transition:transform 0.3s ease, background 0.3s ease, opacity 1s ease;
+  }
+  #next-btn.show {
+    opacity:1;
+  }
+  #next-btn:hover {
+    transform:translateX(-50%) scale(1.05);
+    background:#ffeaf0;
+  }
+
+  /* Exit animation */
+  .fade-out {
+    opacity:0;
+    transform:scale(1.2);
+    visibility:hidden;
+  }
+</style>
+</head>
+<body>
+<audio id="bg-music" src="music.mp3" loop></audio>
+
+<!-- Preloader screen -->
+<div id="preloader">
+  <h2>Ready for your surprise? 💖</h2>
+  <button id="start-btn">Tap to Begin 🎶</button>
+</div>
+
+<!-- Messages -->
+<div id="messages">
+  <div class="message" id="msg1">Even in silence, my soul plays your song 🌙</div>
+  <div class="message" id="msg2">Every heartbeat whispers your name ❤️</div>
+  <div class="message" id="msg3">With you, every moment feels like magic ✨</div>
+  <div class="message" id="msg4">Forever and always, it’s you ❤️</div>
+  <div class="message" id="msg5">You are my today and all of my tomorrows 💍</div>
+  <div class="message" id="msg6">In your eyes, I see my forever 💕</div>
+</div>
+
+<!-- Next button -->
+<button id="next-btn" onclick="window.location.href='fireworks3.html'">✨ Next Surprise</button>
+
+<script>
+// Floating notes (after preloader)
+const words=["Forever","Us","Love","Always","Yours","Destiny","Together"];
+function spawnNote(){
+  const note=document.createElement("div");
+  note.className="note";
+  note.style.left=Math.random()*90+"%";
+  note.style.bottom="0px";
+  note.textContent=Math.random()>0.5?"♪":"♫";
+  if(Math.random()>0.7){
+    note.textContent=words[Math.floor(Math.random()*words.length)];
+  }
+  document.body.appendChild(note);
+  setTimeout(()=>note.remove(),6000);
+}
+
+// Floating hearts (during preloader)
+function spawnHeart(){
+  const heart=document.createElement("div");
+  heart.className="heart";
+  heart.style.left=Math.random()*90+"%";
+  heart.style.bottom="0px";
+  heart.textContent="❤️";
+  document.getElementById("preloader").appendChild(heart);
+  setTimeout(()=>heart.remove(),6000);
+}
+const heartInterval=setInterval(spawnHeart,800);
+
+// Preloader logic
+document.getElementById("start-btn").addEventListener("click", ()=>{
+  const music=document.getElementById("bg-music");
+  music.muted=false;
+  music.play().catch(()=>{});
+
+  const pre=document.getElementById("preloader");
+  pre.classList.add("fade-out");
+
+  clearInterval(heartInterval);
+  setTimeout(()=> setInterval(spawnNote,600), 1000);
+
+  // Sequential message logic
+  const msgs=document.querySelectorAll(".message");
+  let index=0;
+
+  function showNextMessage(){
+    if(index>0) msgs[index-1].classList.remove("show");
+    if(index<msgs.length){
+      msgs[index].classList.add("show");
+      setTimeout(()=>{
+        msgs[index].classList.remove("show");
+        index++;
+        setTimeout(showNextMessage,800); // small gap between messages
+      },4000); // show each for 4 seconds
+    } else {
+      document.getElementById("next-btn").classList.add("show");
+    }
+  }
+
+  setTimeout(showNextMessage,2000); // start after 2s
+});
+</script>
+</body>
+</html>
