@@ -7,18 +7,18 @@
 <style>
   body{
     margin:0;
-    height:100vh;
+    min-height:100vh;            /* allow scroll */
     display:flex;
-    justify-content:center;
-    align-items:center;
     flex-direction:column;
+    justify-content:flex-start;  /* content from top */
+    align-items:center;
     background:linear-gradient(135deg, #ff4e70, #ff99ac, #ffd1dc);
     background-size:300% 300%;
     font-family:"Segoe UI", Roboto, cursive;
     color:white;
     text-align:center;
-    padding:20px;
-    overflow:hidden;
+    padding:40px 20px 100px;     /* bottom padding so button visible */
+    overflow-x:hidden;           /* prevent sideways scroll */
     animation:gradientShift 15s ease infinite;
   }
 
@@ -98,7 +98,7 @@
     <span>💕</span>
     <span>💞</span>
     <span>💓</span>
-    <span❤️</span>
+    <span>❤️</span>
   </div>
 
   <!-- Love Letter -->
@@ -142,5 +142,4 @@ With all my love,
   }, 1000);
 </script>
 </body>
-
 </html>
