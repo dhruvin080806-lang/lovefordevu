@@ -25,40 +25,98 @@
     left:0;
     width:100%;
     height:100%;
-    z-index:0;
+    z-index:0; /* stays behind button */
+    display:none; /* hidden until start */
   }
 
-  h1{
-    position:relative;
-    z-index:1;
-    font-size:2.7em;
-    max-width:80%;
+  .message{
+    position:absolute;
+    top:40%;
+    width:100%;
+    text-align:center;
+    font-size:2.5em;
+    font-weight:bold;
     text-shadow:0 0 25px #ff4d6d, 0 0 50px #ff6b81, 0 0 80px #ffd1dc;
     opacity:0;
-    animation:fadeScale 3s ease forwards 2s, glowPulse 3s infinite alternate 5s;
+    z-index:2;
   }
 
-  @keyframes fadeScale {
-    from{opacity:0; transform:scale(0.8);}
-    to{opacity:1; transform:scale(1);}
+  .fadeInOut{ animation: fadeInOut 10s ease forwards; }
+  .fadeIn3s{ animation: fadeInOut 3s ease forwards; }
+
+  @keyframes fadeInOut {
+    0%{opacity:0; transform:scale(0.9);}
+    10%{opacity:1; transform:scale(1);}
+    85%{opacity:1;}
+    100%{opacity:0; transform:scale(1);}
   }
 
-  @keyframes glowPulse {
-    from{text-shadow:0 0 20px #ff4d6d, 0 0 40px #ff99ac;}
-    to{text-shadow:0 0 40px #ff6b81, 0 0 80px #ffd1dc;}
+  /* Heart */
+  #heart{
+    position:absolute;
+    font-size:clamp(80px, 15vw, 220px);
+    opacity:0;
+    z-index:2;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
   }
+
+  .growHeart{ animation: growHeart 4s ease forwards; }
+  @keyframes growHeart{
+    0%{opacity:1; transform:translate(-50%,-50%) scale(0.5);}
+    30%{transform:translate(-50%,-50%) scale(2);}
+    60%{transform:translate(-50%,-50%) scale(3.5);}
+    80%{transform:translate(-50%,-50%) scale(3);}
+    100%{transform:translate(-50%,-50%) scale(7);}
+  }
+
+  /* Final message blast animation */
+  .blastMessage{ animation: blastMessage 3s ease forwards; }
+  @keyframes blastMessage {
+    0%{opacity:0; transform:scale(0.2);}
+    40%{opacity:1; transform:scale(1.4);}
+    100%{opacity:1; transform:scale(1);}
+  }
+
+  /* Start Button */
+  #startBtn{
+    position:relative;
+    z-index:5; /* always on top */
+    padding:15px 40px;
+    font-size:1.5em;
+    font-weight:bold;
+    color:white;
+    background:linear-gradient(45deg, #ff4d6d, #ff6b81);
+    border:none;
+    border-radius:50px;
+    box-shadow:0 0 20px #ff4d6d;
+    cursor:pointer;
+    transition:transform 0.2s ease;
+  }
+  #startBtn:hover{ transform:scale(1.1); }
 </style>
 </head>
 <body>
+  <button id="startBtn">💖 For You 💖</button>
   <canvas id="fireworks"></canvas>
-  <h1>You Are My Forever, My Always, My Everything 💖</h1>
+
+  <!-- Messages -->
+  <div id="msg1" class="message">You Are My Forever, My Always, My Everything 💖</div>
+  <div id="msg2" class="message">Wait for the last surprise 💫</div>
+  <div id="heart">❤️</div>
+  <div id="msg3" class="message">I Love You More Than Myself ❤️</div>
+
+  <!-- Sounds -->
+  <audio id="bgMusic" src="piano.mp3" loop></audio>
+  <audio id="boomSound" src="https://www.myinstants.com/media/sounds/explosion.mp3"></audio>
 
 <script>
   // Fireworks animation
   const canvas = document.getElementById("fireworks");
   const ctx = canvas.getContext("2d");
   let particles = [];
-  resizeCanvas();
+  let fireworksActive = true;
 
   function resizeCanvas(){
     canvas.width = window.innerWidth;
@@ -67,30 +125,31 @@
   window.addEventListener("resize", resizeCanvas);
 
   class Particle {
-    constructor(x, y, color, angle, speed){
+    constructor(x, y, color, angle, speed, size=2.5, life=100){
       this.x = x;
       this.y = y;
       this.color = color;
       this.angle = angle;
       this.speed = speed;
       this.alpha = 1;
-      this.life = 100;
+      this.life = life;
+      this.size = size;
     }
     update(){
       const rad = this.angle * Math.PI / 180;
       this.x += Math.cos(rad) * this.speed;
       this.y += Math.sin(rad) * this.speed;
       this.speed *= 0.96;
-      this.alpha -= 0.01;
+      this.alpha -= 0.008;
       this.life--;
     }
     draw(){
       ctx.save();
       ctx.globalAlpha = this.alpha;
       ctx.beginPath();
-      ctx.arc(this.x, this.y, 2.5, 0, Math.PI*2);
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
       ctx.fillStyle = this.color;
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 25;
       ctx.shadowColor = this.color;
       ctx.fill();
       ctx.restore();
@@ -111,7 +170,7 @@
   }
 
   function animate(){
-    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
     particles.forEach((p, index) => {
@@ -122,14 +181,76 @@
       }
     });
 
-    if(Math.random() < 0.05){
+    if(fireworksActive && Math.random() < 0.05){
       createFirework();
     }
 
     requestAnimationFrame(animate);
   }
 
-  animate();
+  // Sequence control
+  const msg1 = document.getElementById("msg1");
+  const msg2 = document.getElementById("msg2");
+  const msg3 = document.getElementById("msg3");
+  const heart = document.getElementById("heart");
+  const boomSound = document.getElementById("boomSound");
+  const bgMusic = document.getElementById("bgMusic");
+
+  function startSequence(){
+    // Hide button
+    document.getElementById("startBtn").style.display="none";
+
+    // Show fireworks canvas
+    canvas.style.display="block";
+    resizeCanvas();
+    animate();
+
+    // Play piano
+    bgMusic.play().catch(()=>{}); 
+
+    // Step 1: Show first message
+    setTimeout(()=>{ msg1.classList.add("fadeInOut"); },500);
+
+    // Step 2: Stop fireworks after 10s
+    setTimeout(()=>{ fireworksActive = false; },10000);
+
+    // Step 3: Show waiting message
+    setTimeout(()=>{ msg2.classList.add("fadeIn3s"); },10500);
+
+    // Step 4: Remove wait msg, show heart
+    setTimeout(()=>{
+      msg2.style.opacity=0; 
+      heart.classList.add("growHeart"); 
+      heart.style.opacity=1;
+    },13500);
+
+    // Step 5: Heart explosion effect
+    function heartExplosion(){
+      const x = canvas.width/2;
+      const y = canvas.height/2;
+      const colors = ["#ff1a4d","#ff4d6d","#ff6b81","#ff99ac","#ffd1dc","#ffe066"];
+      const count = 400;
+      for(let i=0;i<count;i++){
+        const angle = Math.random()*360;
+        const speed = Math.random()*15+6;
+        const size = Math.random()*4+3;
+        const color = colors[Math.floor(Math.random()*colors.length)];
+        particles.push(new Particle(x,y,color,angle,speed,size,80));
+      }
+    }
+
+    setTimeout(()=>{
+      heart.style.opacity=0; 
+      heartExplosion(); 
+      boomSound.play(); // 💥
+      bgMusic.pause();  // 🎶 stop piano
+      msg3.classList.add("blastMessage"); 
+    },17500);
+  }
+
+  // Start button click
+  document.getElementById("startBtn").addEventListener("click", startSequence);
 </script>
 </body>
 </html>
+
